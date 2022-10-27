@@ -80,7 +80,8 @@ def swizzle_yup(v: typing.Union[Vector, Quaternion], data_path: str) -> typing.U
         "rotation_euler": swizzle_yup_rotation,
         "rotation_quaternion": swizzle_yup_rotation,
         "scale": swizzle_yup_scale,
-        "value": swizzle_yup_value
+        "value": swizzle_yup_value,
+        "default_value": transform_value2d
     }.get(target)
 
     if swizzle_func is None:
@@ -121,7 +122,8 @@ def transform(v: typing.Union[Vector, Quaternion], data_path: str, transform: Ma
         "rotation_euler": transform_rotation,
         "rotation_quaternion": transform_rotation,
         "scale": transform_scale,
-        "value": transform_value
+        "value": transform_value,
+        "default_value": transform_value2d
     }.get(target)
 
     if transform_func is None:
@@ -165,6 +167,12 @@ def transform_scale(scale: Vector, transform: Matrix = Matrix.Identity(4), need_
 def transform_value(value: Vector, _: Matrix = Matrix.Identity(4), need_rotation_correction: bool = False) -> Vector:
     """Transform value."""
     return value
+
+
+def transform_value2d(value: Vector, _: Matrix = Matrix.Identity(4), need_rotation_correction: bool = False) -> Vector:
+    """Transform value."""
+    x, y, *_ = value
+    return [x, y]
 
 
 def round_if_near(value: float, target: float) -> float:

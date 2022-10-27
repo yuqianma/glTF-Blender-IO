@@ -35,7 +35,7 @@ class Keyframe:
         # Note: channels has some None items only for SK if some SK are not animated
         if bake_channel is None:
             self.target = [c for c in channels if c is not None][0].data_path.split('.')[-1]
-            if self.target != "value":
+            if self.target != "value" and self.target != "default_value":
                 self.__indices = [c.array_index for c in channels]
             else:
                 self.__indices = [i for i, c in enumerate(channels) if c is not None]
@@ -61,7 +61,8 @@ class Keyframe:
             "rotation_euler": 3,
             "rotation_quaternion": 4,
             "scale": 3,
-            "value": self.__length_morph
+            "value": self.__length_morph,
+            "default_value": self.__length_morph
         }.get(self.target)
 
         if length is None:
@@ -136,7 +137,7 @@ class Keyframe:
         self.__out_tangent = self.__set_indexed(value)
 
 
-@objectcache
+# @objectcache
 def get_object_matrix(blender_obj_uuid: str,
                       action_name: str,
                       bake_range_start: int,
