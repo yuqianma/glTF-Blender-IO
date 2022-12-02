@@ -104,6 +104,16 @@ def __gather_animations(blender_scene, export_settings):
         animations_, merged_tracks = gltf2_blender_gather_animations.gather_animations(obj_uuid, merged_tracks, len(animations), export_settings)
         animations += animations_
 
+    # Remove duplicates
+    distinct_names = set()
+    distinct_animations = []
+    for animation in animations:
+        if animation.name not in distinct_names:
+            distinct_names.add(animation.name)
+            distinct_animations.append(animation)
+
+    animations = distinct_animations
+
     if export_settings['gltf_nla_strips'] is False:
         # Fake an animation with all animations of the scene
         merged_tracks = {}
