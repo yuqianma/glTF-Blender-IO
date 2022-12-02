@@ -278,6 +278,14 @@ def __get_blender_actions(blender_object: bpy.types.Object,
             blender_tracks[blender_object.animation_data.action.name] = None
             action_on_type[blender_object.animation_data.action.name] = "OBJECT"
 
+        try:
+            material_action = blender_object.material_slots[0].material.node_tree.animation_data.action
+            blender_actions.append(material_action)
+            blender_tracks[material_action.name] = None
+            action_on_type[material_action.name] = "MATERIAL"
+        except:
+            pass
+
         # Collect associated strips from NLA tracks.
         if export_settings['gltf_nla_strips'] is True:
             for track in blender_object.animation_data.nla_tracks:

@@ -31,7 +31,7 @@ from . import gltf2_blender_export_keys
 from io_scene_gltf2.io.exp.gltf2_io_user_extensions import export_user_extensions
 
 
-@cached
+# @cached
 def gather_animation_sampler(channels: typing.Tuple[bpy.types.FCurve],
                              obj_uuid: str,
                              bake_bone: typing.Union[str, None],
@@ -235,7 +235,7 @@ def __gather_extras(channels: typing.Tuple[bpy.types.FCurve],
                     ) -> typing.Any:
     return None
 
-@cached
+# @cached
 def __gather_input(channels: typing.Tuple[bpy.types.FCurve],
                    blender_obj_uuid: str,
                    is_armature: bool,

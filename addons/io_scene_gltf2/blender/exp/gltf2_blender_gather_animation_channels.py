@@ -473,9 +473,14 @@ def __get_channel_groups(blender_action: bpy.types.Action, blender_object: bpy.t
                             continue
                         target = blender_object.data.shape_keys
                     except:
-                        # Something is wrong, for example a bone animation is linked to an object mesh...
-                        gltf2_io_debug.print_console("WARNING", "Animation target {} not found".format(object_path))
-                        continue
+                        # hack: material node_tree
+                        if object_path.startswith("nodes["):
+                            node_tree = blender_object.material_slots[0].material.node_tree
+                            target = node_tree.path_resolve(object_path)
+                        else:                            
+                            # Something is wrong, for example a bone animation is linked to an object mesh...
+                            gltf2_io_debug.print_console("WARNING", "Animation target {} not found".format(object_path))
+                            continue
                 else:
                     gltf2_io_debug.print_console("WARNING", "Animation target {} not found".format(object_path))
                     continue
