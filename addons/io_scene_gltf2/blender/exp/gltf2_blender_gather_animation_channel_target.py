@@ -74,8 +74,11 @@ def __gather_pointer_extensions(channels: typing.Tuple[bpy.types.FCurve],
                         bake_bone: typing.Union[str, None]
                         ) -> typing.Any:
     print(len(channels), channels[0].data_path)
-    # hard coded first material
-    node_tree = blender_object.material_slots[0].material.node_tree
+    # assume only one material in an object
+    material = blender_object.material_slots[0].material
+    # we cannot know material index now, save name for later
+    material_name_string = "/materials/" + material.name + "/"
+    node_tree = material.node_tree
     node_path = channels[0].data_path.rsplit('.', 2)[0]
     node = node_tree.path_resolve(node_path)
     print(node)
@@ -111,7 +114,7 @@ def __gather_pointer_extensions(channels: typing.Tuple[bpy.types.FCurve],
         if tex_name is None or transform_type is None:
             return None
         pointer = {
-            "pointer": "/materials/0/" + tex_name +"/extensions/KHR_texture_transform/" + transform_type
+            "pointer": material_name_string + tex_name +"/extensions/KHR_texture_transform/" + transform_type
         }
     elif node.type == 'BSDF_PRINCIPLED':
         pbr_socket_path = channels[0].data_path.rsplit('.', 1)[0]
@@ -124,7 +127,7 @@ def __gather_pointer_extensions(channels: typing.Tuple[bpy.types.FCurve],
         if gltf_path_name is None:
             return None
         pointer = {
-            "pointer": "/materials/0/" + gltf_path_name
+            "pointer": material_name_string + gltf_path_name
         }
 
     extension = Extension("KHR_animation_pointer", pointer)

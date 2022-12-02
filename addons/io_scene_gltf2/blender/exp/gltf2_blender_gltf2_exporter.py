@@ -306,6 +306,18 @@ class GlTF2Exporter:
 
         # traverse into any other property
         if type(node) in self.__propertyTypeLookup:
+            if type(node) == gltf2_io.AnimationChannel:
+                materials = self._GlTF2Exporter__gltf.materials
+                pointer = None
+                try:
+                    pointer = node.target.extensions["KHR_animation_pointer"].extension["pointer"]
+                except KeyError:
+                    pass
+                if pointer:
+                    _, prefix, name, path = pointer.split('/', 3)
+                    material_index = next(iter([i for i, j in enumerate(materials) if j.name == name]), -1)
+                    node.target.extensions["KHR_animation_pointer"].extension["pointer"] = "/" + prefix + "/" + str(material_index) + "/" + path
+                print(pointer)
             return __traverse_property(node)
 
         # binary data needs to be moved to a buffer and referenced with a buffer view
