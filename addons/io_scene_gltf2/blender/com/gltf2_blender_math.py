@@ -81,7 +81,7 @@ def swizzle_yup(v: typing.Union[Vector, Quaternion], data_path: str) -> typing.U
         "rotation_quaternion": swizzle_yup_rotation,
         "scale": swizzle_yup_scale,
         "value": swizzle_yup_value,
-        "default_value": transform_value2d
+        "default_value": swizzle_yup_value
     }.get(target)
 
     if swizzle_func is None:
@@ -114,6 +114,18 @@ def transform(v: typing.Union[Vector, Quaternion], data_path: str, transform: Ma
         .Union[Vector, Quaternion]:
     """Manage transformations."""
     target = get_target_property_name(data_path)
+
+    # nodes["Mapping"].inputs[1].default_value
+    # nodes["Principled BSDF"].inputs[19].default_value
+    if target == "default_value":
+        if "Mapping" in data_path:
+            return transform_value_vec2(v, transform, need_rotation_correction)
+        elif "Principled BSDF" in data_path:
+            return transform_value_vec3(v, transform, need_rotation_correction)
+        else:
+            print("Cannot transform values at {}".format(data_path))
+            return transform_value(v, transform, need_rotation_correction)
+
     transform_func = {
         "delta_location": transform_location,
         "delta_rotation_euler": transform_rotation,
@@ -122,8 +134,7 @@ def transform(v: typing.Union[Vector, Quaternion], data_path: str, transform: Ma
         "rotation_euler": transform_rotation,
         "rotation_quaternion": transform_rotation,
         "scale": transform_scale,
-        "value": transform_value,
-        "default_value": transform_value2d
+        "value": transform_value
     }.get(target)
 
     if transform_func is None:
@@ -169,10 +180,16 @@ def transform_value(value: Vector, _: Matrix = Matrix.Identity(4), need_rotation
     return value
 
 
-def transform_value2d(value: Vector, _: Matrix = Matrix.Identity(4), need_rotation_correction: bool = False) -> Vector:
+def transform_value_vec2(value: Vector, _: Matrix = Matrix.Identity(4), need_rotation_correction: bool = False) -> Vector:
     """Transform value."""
+    # texture coordinate
     x, y, *_ = value
-    return [x, y]
+    return [x, -y]
+
+def transform_value_vec3(value: Vector, _: Matrix = Matrix.Identity(4), need_rotation_correction: bool = False) -> Vector:
+    """Transform value."""
+    x, y, z, *_ = value
+    return [x, y, z]
 
 
 def round_if_near(value: float, target: float) -> float:

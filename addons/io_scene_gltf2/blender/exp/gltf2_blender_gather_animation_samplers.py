@@ -465,7 +465,13 @@ def __gather_output(channels: typing.Tuple[bpy.types.FCurve],
         # channels with 'weight' targets must have scalar accessors
         data_type = gltf2_io_constants.DataType.Scalar
     if get_target_property_name(target_datapath) == "default_value":
-        data_type = "VEC2"
+        data_type = gltf2_io_constants.DataType.Scalar
+        if "Mapping" in target_datapath:
+            data_type = gltf2_io_constants.DataType.Vec2
+        elif "Principled BSDF" in target_datapath:
+            data_type = gltf2_io_constants.DataType.Vec4
+        else:
+            print("TODO: handle default_value: " + target_datapath)
     else:
         data_type = gltf2_io_constants.DataType.vec_type_from_num(len(keyframes[0].value))
 
