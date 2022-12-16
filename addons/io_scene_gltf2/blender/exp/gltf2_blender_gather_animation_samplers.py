@@ -426,16 +426,17 @@ def __gather_output(channels: typing.Tuple[bpy.types.FCurve],
 
     values = []
     fps = bpy.context.scene.render.fps
+    blender_object = export_settings['vtree'].nodes[blender_obj_uuid].blender_object
     for keyframe in keyframes:
         # Transform the data and build gltf control points
-        value = gltf2_blender_math.transform(keyframe.value, target_datapath, transform, need_rotation_correction)
+        value = gltf2_blender_math.transform(keyframe.value, target_datapath, transform, need_rotation_correction, blender_object)
         if is_yup and not is_armature_animation:
             value = gltf2_blender_math.swizzle_yup(value, target_datapath)
         keyframe_value = gltf2_blender_math.mathutils_to_gltf(value)
 
         if keyframe.in_tangent is not None:
             # we can directly transform the tangent as it currently is represented by a control point
-            in_tangent = gltf2_blender_math.transform(keyframe.in_tangent, target_datapath, transform, need_rotation_correction)
+            in_tangent = gltf2_blender_math.transform(keyframe.in_tangent, target_datapath, transform, need_rotation_correction, blender_object)
             if is_yup and blender_object_if_armature is None:
                 in_tangent = gltf2_blender_math.swizzle_yup(in_tangent, target_datapath)
             # the tangent in glTF is relative to the keyframe value and uses seconds
@@ -447,7 +448,7 @@ def __gather_output(channels: typing.Tuple[bpy.types.FCurve],
 
         if keyframe.out_tangent is not None:
             # we can directly transform the tangent as it currently is represented by a control point
-            out_tangent = gltf2_blender_math.transform(keyframe.out_tangent, target_datapath, transform, need_rotation_correction)
+            out_tangent = gltf2_blender_math.transform(keyframe.out_tangent, target_datapath, transform, need_rotation_correction, blender_object)
             if is_yup and blender_object_if_armature is None:
                 out_tangent = gltf2_blender_math.swizzle_yup(out_tangent, target_datapath)
             # the tangent in glTF is relative to the keyframe value and uses seconds

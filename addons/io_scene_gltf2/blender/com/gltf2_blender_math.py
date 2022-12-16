@@ -110,7 +110,7 @@ def swizzle_yup_value(value: typing.Any) -> typing.Any:
     return value
 
 
-def transform(v: typing.Union[Vector, Quaternion], data_path: str, transform: Matrix = Matrix.Identity(4), need_rotation_correction: bool = False) -> typing \
+def transform(v: typing.Union[Vector, Quaternion], data_path: str, transform: Matrix = Matrix.Identity(4), need_rotation_correction: bool = False, blender_object: typing.Any = None) -> typing \
         .Union[Vector, Quaternion]:
     """Manage transformations."""
     target = get_target_property_name(data_path)
@@ -118,9 +118,13 @@ def transform(v: typing.Union[Vector, Quaternion], data_path: str, transform: Ma
     # nodes["Mapping"].inputs[1].default_value
     # nodes["Principled BSDF"].inputs[19].default_value
     if target == "default_value":
-        if "Mapping" in data_path:
+        material = blender_object.material_slots[0].material
+        node_tree = material.node_tree
+        node_path = data_path.rsplit('.', 2)[0]
+        node = node_tree.path_resolve(node_path)
+        if node.type == 'MAPPING':
             return transform_value_vec2(v, transform, need_rotation_correction)
-        elif "Principled BSDF" in data_path:
+        elif node.type == 'BSDF_PRINCIPLED':
             return transform_value_vec3(v, transform, need_rotation_correction)
         else:
             print("Cannot transform values at {}".format(data_path))
